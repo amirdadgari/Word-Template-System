@@ -1,0 +1,14 @@
+{
+  "name": "word-doc-gen",
+  "private": true,
+  "workspaces": [
+    "server",
+    "web"
+  ],
+  "scripts": {
+    "dev": "npm -w server run dev & npm -w web run dev",
+    "build": "npm -w web run build",
+    "start": "npm -w server start"
+  }
+}
+

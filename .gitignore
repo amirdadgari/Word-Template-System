@@ -1,0 +1,9 @@
+node_modules
+.DS_Store
+server/data
+server/uploads
+server/generated
+web/dist
+web/.vite
+npm-debug.log*
+

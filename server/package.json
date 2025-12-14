@@ -1,0 +1,21 @@
+{
+  "name": "word-doc-gen-server",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "node --watch src/index.js",
+    "start": "node src/index.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.21.2",
+    "he": "^1.2.0",
+    "jszip": "^3.10.1",
+    "jsonpath-plus": "^10.3.0",
+    "mammoth": "^1.8.0",
+    "multer": "^2.0.2",
+    "nanoid": "^5.1.5",
+    "zod": "^3.25.76",
+    "docx-templates": "^4.15.0"
+  }
+}
