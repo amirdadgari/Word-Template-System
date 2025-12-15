@@ -25,3 +25,9 @@ npm run build
 npm run start
 ```
 Server serves the built UI from `web/dist`.
+
+## Docker (production)
+Copy `docker-compose.sample.yml` to `docker-compose.yml`, adjust as needed, then run:
+```bash
+docker compose up -d --build
+```

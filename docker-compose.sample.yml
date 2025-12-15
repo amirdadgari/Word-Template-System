@@ -1,0 +1,20 @@
+services:
+  app:
+    build:
+      context: .
+    ports:
+      - "${APP_PORT:-3001}:3001"
+    environment:
+      PORT: 3001
+      NODE_ENV: production
+    volumes:
+      - app_data:/app/server/data
+      - app_uploads:/app/server/uploads
+      - app_generated:/app/server/generated
+    restart: unless-stopped
+
+volumes:
+  app_data:
+  app_uploads:
+  app_generated:
+

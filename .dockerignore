@@ -1,0 +1,16 @@
+node_modules
+npm-debug.log*
+
+.git
+.DS_Store
+
+web/dist
+web/.vite
+
+server/data
+server/uploads
+server/generated
+
+# Old/local artifacts accidentally committed
+server/server
+
