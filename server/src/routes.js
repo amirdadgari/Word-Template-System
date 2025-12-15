@@ -146,7 +146,7 @@ apiRouter.get('/templates/:id/editor', async (req, res) => {
     return `<span class="tpl-token" data-token="${tokenId}" contenteditable="true">${escaped}</span>`;
   });
 
-  res.json({ html, name: row.name });
+  res.json({ html, name: row.name, tokenIds: Object.keys(tokenToOriginal) });
 });
 
 apiRouter.post('/templates/:id/editor/save', async (req, res) => {
