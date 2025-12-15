@@ -113,10 +113,15 @@ textarea {
 .tpl-token {
   outline: none;
   border-radius: 4px;
+  display: inline-block;
+  padding: 1px 4px;
+  border: 1px dashed #cbd5e1;
+  background: #f8fafc;
 }
 
 .tpl-token:focus {
   box-shadow: 0 0 0 2px #93c5fd;
+  border-style: solid;
 }
 
 .doc-preview :is(table) {

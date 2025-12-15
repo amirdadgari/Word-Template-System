@@ -156,6 +156,38 @@ export function transformTextNodes(documentXml, transformFn) {
   return applyNodeTextEdits(documentXml, nodes, newTexts);
 }
 
+export function replaceTextNodesPreservingRuns(documentXml, replacementByIndex) {
+  const nodes = listTextNodes(documentXml);
+  let out = '';
+  let lastIndex = 0;
+
+  for (let i = 0; i < nodes.length; i++) {
+    const n = nodes[i];
+    out += documentXml.slice(lastIndex, n.start);
+
+    if (!replacementByIndex.has(i)) {
+      out += documentXml.slice(n.start, n.end);
+      lastIndex = n.end;
+      continue;
+    }
+
+    const openTag = documentXml.slice(n.start, n.innerStart);
+    const closeTag = documentXml.slice(n.innerEnd, n.end);
+    const value = String(replacementByIndex.get(i) ?? '');
+
+    const parts = value.split(/\r?\n/);
+    for (let p = 0; p < parts.length; p++) {
+      if (p > 0) out += '<w:br/>';
+      out += openTag + escapeXmlText(parts[p]) + closeTag;
+    }
+
+    lastIndex = n.end;
+  }
+
+  out += documentXml.slice(lastIndex);
+  return out;
+}
+
 export function tokenizedEditorXml(documentXml) {
   const nodes = listTextNodes(documentXml);
   const tokenToOriginal = {};

@@ -35,7 +35,8 @@ export default function TemplateDetailPage() {
     spans.forEach((s) => {
       const token = s.dataset.token;
       if (!token) return;
-      tokens[token] = s.innerText;
+      const part = s.innerText ?? '';
+      tokens[token] = tokens[token] === undefined ? part : `${tokens[token]}\n${part}`;
     });
     return tokens;
   }
@@ -81,7 +82,13 @@ export default function TemplateDetailPage() {
         <div style={{ marginTop: 6 }}>
           Advanced:
           <span className="mono"> @if ($.isActive) {'{'} ... @endif</span> and{' '}
-          <span className="mono"> @for ($.myArray) {'{'} ... @endfor</span>
+          <span className="mono"> @for ($.myArray) {'{'} ... @endfor</span> (or put <span className="mono">{'}'}</span> as
+          a standalone cell/paragraph to close).
+          <div style={{ marginTop: 6 }}>
+            Tables: put <span className="mono">@for ($.rows) {'{'}</span> in the first cell of the row you want to repeat,
+            and <span className="mono">@endfor</span> (or a standalone <span className="mono">{'}'}</span>) in the first
+            cell of the row that ends the loop.
+          </div>
         </div>
       </div>
 
@@ -89,6 +96,47 @@ export default function TemplateDetailPage() {
       <div
         id="tpl-editor"
         className="doc-preview"
+        onKeyDown={(e) => {
+          if (e.key !== 'Enter') return;
+          e.preventDefault();
+          const tokenEl = (e.target as HTMLElement | null)?.closest?.('span.tpl-token[data-token]') as
+            | HTMLSpanElement
+            | null;
+          if (!tokenEl) return;
+
+          const selection = window.getSelection();
+          if (!selection || selection.rangeCount === 0) return;
+          const range = selection.getRangeAt(0);
+          if (!tokenEl.contains(range.startContainer)) return;
+
+          const full = tokenEl.innerText ?? '';
+          const pre = range.cloneRange();
+          pre.selectNodeContents(tokenEl);
+          pre.setEnd(range.startContainer, range.startOffset);
+          const caretIndex = pre.toString().length;
+
+          const before = full.slice(0, caretIndex);
+          const after = full.slice(caretIndex);
+
+          tokenEl.innerText = before;
+
+          const br = document.createElement('br');
+          const newSpan = document.createElement('span');
+          newSpan.className = 'tpl-token';
+          newSpan.dataset.token = tokenEl.dataset.token ?? '';
+          newSpan.contentEditable = 'true';
+          newSpan.innerText = after;
+
+          tokenEl.insertAdjacentElement('afterend', br);
+          br.insertAdjacentElement('afterend', newSpan);
+
+          const textNode = newSpan.firstChild ?? newSpan;
+          const newRange = document.createRange();
+          newRange.setStart(textNode, 0);
+          newRange.collapse(true);
+          selection.removeAllRanges();
+          selection.addRange(newRange);
+        }}
         dangerouslySetInnerHTML={{ __html: editorHtml }}
         suppressContentEditableWarning
       />

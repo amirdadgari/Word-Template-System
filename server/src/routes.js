@@ -15,7 +15,7 @@ import {
   replaceAllTextAcrossRuns,
   extractTextFromDocumentXml,
   tokenizedEditorXml,
-  transformTextNodes,
+  replaceTextNodesPreservingRuns,
   updateDocxDocumentXml,
   buildInputShapeFromJsonPaths,
   evaluateJsonPath
@@ -162,13 +162,14 @@ apiRouter.post('/templates/:id/editor/save', async (req, res) => {
   if (!parsed.success) return res.status(400).json({ error: parsed.error.message });
 
   const buf = await readFileBuffer(row.workingPath);
-  const updatedBuf = await updateDocxDocumentXml(buf, (xml) =>
-    transformTextNodes(xml, (text, idx) => {
-      const tokenId = `t${idx}`;
-      if (Object.prototype.hasOwnProperty.call(parsed.data.tokens, tokenId)) return parsed.data.tokens[tokenId];
-      return text;
-    })
-  );
+  const updatedBuf = await updateDocxDocumentXml(buf, (xml) => {
+    const replacements = new Map();
+    for (const [tokenId, value] of Object.entries(parsed.data.tokens)) {
+      const idx = Number(tokenId.startsWith('t') ? tokenId.slice(1) : NaN);
+      if (Number.isFinite(idx)) replacements.set(idx, value);
+    }
+    return replaceTextNodesPreservingRuns(xml, replacements);
+  });
   await fs.writeFile(row.workingPath, updatedBuf);
 
   const updatedXml = await readDocumentXmlFromDocxBuffer(updatedBuf);
